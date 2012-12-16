@@ -16,8 +16,8 @@ public class GraphUtils{
             dy = new int[]{0, 1, 0, -1};
         }
         int n = map.length, m = map[0].length;
-        int q[][] = new int[2][n*m], qn = 1;
-        q[0][0] = sx; q[1][0] = sy;
+        int q[][] = new int[2][n*m], qn;
+        q[0][0] = sx; q[1][0] = sy; qn = 1;
         int d[][] = new int[n][m];
         for(int r[] : d) Arrays.fill(r, Integer.MAX_VALUE);
         d[sx][sy] = 0;
