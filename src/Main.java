@@ -21,32 +21,74 @@ public class Main {
 		OutputStream outputStream = System.out;
 		InputReader in = new InputReader(inputStream);
 		OutputWriter out = new OutputWriter(outputStream);
-		F solver = new F();
-		int testCount = Integer.parseInt(in.next());
-		for (int i = 1; i <= testCount; i++)
-			solver.solve(i, in, out);
+		TaskB solver = new TaskB();
+		solver.solve(1, in, out);
 		out.close();
 	}
 }
 
-class F {
+class TaskB {
 	public void solve(int testNumber, InputReader in, OutputWriter out) {
-        int n = in.nextInt();
-        int b[] = in.nextIntArray(n);
-        int a[] = b.clone();
-        for(int i=0;i<n;++i){
-            a[i] = Math.min(a[i], i>0?a[i-1]+1:1);
+        
+        long n = in.nextLong();
+        long x = in.nextLong();
+        long y = in.nextLong();
+        long c = in.nextLong();
+        
+        long tl, tr, tt = -1, t;
+        tl = 0;
+        tr = (long) 4e9;
+        while(tl<tr){
+            t = (tl+tr)>>1;
+            
+            long cc = f(n, t, x, y);
+            if(cc>=c){
+                tt = t;
+                tr = t;
+            }else tl = t+1;
         }
         
-        for(int i=n-1;i>=0;--i){
-            a[i] = Math.min(a[i], i<n-1?a[i+1]+1:1);
-        }
-        
-        int res = 0;
-        for(int i=0;i<n;++i) res+=b[i]-a[i];
-        
-        out.writeln(res);
+        out.writeln(tt);
 	}
+    
+    
+    public static long f(long n, long t, long x, long y){
+        
+        long res = (t*t+t)/2 * 4 + 1;
+        long s;
+        
+        if(x-t<1){
+            s = t-x+1;
+            res -= s*s;
+        }
+        if(y-t<1){
+            s = t-y+1;
+            res -= s*s;
+        }
+        if(x+t>n){
+            s = x+t-n;
+            res -= s*s;
+        }
+        if(y+t>n){
+            s = y+t-n;
+            res -= s*s;
+        }
+
+        s = t-(Math.abs(x-1)+Math.abs(y-1))-1;
+        if(s>0) res+=(s*s+s)/2;
+
+        s = t-(Math.abs(x-1)+Math.abs(n-y))-1;
+        if(s>0) res+=(s*s+s)/2;
+
+        s = t-(Math.abs(n-x)+Math.abs(n-y))-1;
+        if(s>0) res+=(s*s+s)/2;
+
+        s = t-(Math.abs(n-x)+Math.abs(y-1))-1;
+        if(s>0) res+=(s*s+s)/2;
+        
+        
+        return res;
+    }
 }
 
 class InputReader{
@@ -69,16 +111,11 @@ class InputReader{
         return tokenizer.nextToken();
     }
     
-    public int nextInt(){
-        return Integer.parseInt(next());
+    public long nextLong(){
+        return Long.parseLong(next());
     }
-
-    public int[] nextIntArray(int n){
-        int res[] = new int[n];
-        for(int i=0;i<n;++i) res[i] = nextInt();
-        return res;
+    
     }
-}
 
 class OutputWriter{
     private PrintWriter out;
