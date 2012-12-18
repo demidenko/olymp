@@ -256,7 +256,7 @@ public class NumUtils {
     }
     
 
-    public static class CRT {
+    public static class CRT{
         private int n;
         private long p[], inv[][];
         private BigInteger max, len;
@@ -329,6 +329,87 @@ public class NumUtils {
                 pr = pr*p[i]%mod;
             }
             return res;
+        }
+    }
+    
+    
+    public static class Karatsuba{
+        private static int MAXN;
+        private static int SMALL = 1<<3;
+        private int d;
+        private int t[];
+        
+        public Karatsuba(int maxBits){
+            for(MAXN = 1; MAXN<maxBits; MAXN<<=1);
+            t = new int[8*MAXN];
+        }
+        
+        private void rec(int as, int bs, int rets, int n){
+            if(n<=SMALL){
+                for(int i=0;i<2*n;++i) t[rets + i] = 0;
+                for(int i=0;i<n;++i)
+                    for(int j=0;j<n;++j) t[rets + i+j] += t[as + i] * t[bs + j];
+                return;
+            }
+            int ar = as;
+            int al = as + n/2;
+            int br = bs;
+            int bl = bs + n/2;
+            int asum = rets + n*5;
+            int bsum = rets + n*5 + n/2;
+            int x1 = rets;
+            int x2 = rets + n;
+            int x3 = rets + n*2;
+            for(int i=0;i<n/2;++i){
+                t[asum + i] = t[al + i] + t[ar + i];
+                t[bsum + i] = t[bl + i] + t[br + i];
+            }
+            rec(ar, br, x1, n / 2);
+            rec(al, bl, x2, n / 2);
+            rec(asum, bsum, x3, n / 2);
+            for(int i=0;i<n;++i) t[x3 + i] -= t[x1 + i] + t[x2 + i];
+            for(int i=0;i<n;++i) t[rets + i+n/2] += t[x3 + i];
+        }
+        
+        public int[] multiply(int A[], int B[]){
+            int n = Math.max(A.length, B.length);
+            for(d=1; d<n; d<<=1);
+            int as = d*6, bs = d*7, rets = 0;
+            for(int i=0;i<d;++i){
+                t[as + i] = i<n ? A[i] : 0;
+                t[bs + i] = i<n ? B[i] : 0;
+            }
+            rec(as, bs, rets, d);
+            return Arrays.copyOf(t, d*2);
+        }
+        
+        public BigInteger multiply(BigInteger A, BigInteger B){
+            byte Ab[] = A.toByteArray();
+            byte Bb[] = B.toByteArray();
+            int signA = A.signum()<0 ? 255 : 0;
+            int signB = B.signum()<0 ? 255 : 0;
+            int n = Math.max(Ab.length, Bb.length);
+            for(d=1; d<n; d<<=1);
+            int as = d*6, bs = d*7, rets = 0;
+            for(int i=0;i<d;++i){
+                int x = Ab.length-i-1>=0 ? Ab[Ab.length-i-1] : signA;
+                if(x<0) x+=256;
+                if(A.signum()<0) x = (~(x-1)) & 255;
+                t[as + i] = x;
+                int y = Bb.length-i-1>=0 ? Bb[Bb.length-i-1] : signB;
+                if(y<0) y+=256;
+                if(B.signum()<0) y = (~(y-1)) & 255;
+                t[bs + i] = y;
+            }
+            rec(as, bs, rets, d);
+            byte res[] = new byte[d*2];
+            int rem = 0;
+            for(int i=0;i<d*2;++i){
+                rem += t[i];
+                res[2*d-i-1] = (byte) (rem & 255);
+                rem>>=8;
+            }
+            return new BigInteger(A.signum()*B.signum(), res);
         }
     }
 
