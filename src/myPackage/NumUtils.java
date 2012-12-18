@@ -71,7 +71,7 @@ public class NumUtils {
 
     public static long pow(long a, long b, long mod){
         long res = 1;
-        a%=mod;
+        a=(a%mod+mod)%mod;
         while(b>0){
             if((b&1)==1) res=(res*a)%mod;
             a=(a*a)%mod;
