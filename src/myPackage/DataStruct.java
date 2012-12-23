@@ -121,11 +121,11 @@ public class DataStruct {
         }
     }
 
-    public static class SegmentTreeArr{
+    public static class SegmentTreeArray {
         private int t[][];
         private int d;
 
-        public SegmentTreeArr(int array[]){
+        public SegmentTreeArray(int array[]){
             int n = array.length, i;
             for(d=1; d<n; d<<=1);
             t = new int[d<<1][];
@@ -290,7 +290,7 @@ public class DataStruct {
             return getSum(left, right, 0, d-1, 1);
         }
     }
-
+    
     public static class SegmentTreeSumSegSet{
         static private int unknown = Integer.MIN_VALUE;
         private long t[];
@@ -395,6 +395,82 @@ public class DataStruct {
 
         public long getMaximum(int left, int right){
             return getMaximum(left, right, 0, d-1, 1);
+        }
+    }
+
+    public static class SegmentTreeMinCntSegAdd {
+        private int t[];
+        private int cnt[];
+        private int add[];
+        private int d;
+
+        public SegmentTreeMinCntSegAdd(int[] array){
+            int n = array.length, i;
+            for(d=1; d<n; d<<=1);
+            t = new int[d<<1];
+            add = new int[d<<1];
+            cnt = new int[d<<1];
+            for(i=d; i<n+d; ++i){ t[i] = array[i-d]; cnt[i] = 1; }
+            for(i=n+d; i<d+d; ++i){ t[i] = Integer.MAX_VALUE; cnt[i] = 1; }
+            for(i=d-1; i>0; --i){
+                if(t[i*2]<t[i*2+1]){
+                    t[i] = t[i*2];
+                    cnt[i] = cnt[i*2] + (t[i*2]==t[i*2+1] ? cnt[i*2+1] : 0);
+                }else{
+                    t[i] = t[i*2+1];
+                    cnt[i] = cnt[i*2+1] + (t[i*2]==t[i*2+1] ? cnt[i*2] : 0);
+                }
+            }
+        }
+
+        private void add(int i, int j, int value, int left, int right, int node){
+            if(i==left && j==right){
+                add[node] += value;
+                t[node] += value;
+            }else{
+                int middle = (left+right)>>1;
+                if(i<=middle) add(i, Math.min(j,middle), value, left, middle, node*2);
+                if(j>middle) add(Math.max(i, middle + 1), j, value, middle+1, right, node*2+1);
+                if(t[node*2]<t[node*2+1]){
+                    t[node] = t[node*2];
+                    cnt[node] = cnt[node*2] + (t[node*2]==t[node*2+1] ? cnt[node*2+1] : 0);
+                }else{
+                    t[node] = t[node*2+1];
+                    cnt[node] = cnt[node*2+1] + (t[node*2]==t[node*2+1] ? cnt[node*2] : 0);
+                }
+                t[node] += add[node];
+            }
+        }
+
+        public void addRange(int left, int right, int value){
+            if(left<=right && 0<=left && right<d)
+                add(left, right, value, 0, d-1, 1);
+        }
+
+        private int[] getMinimum(int i, int j, int left, int right, int node){
+            if(i>j || left>right || left>i || j>right) return new int[]{Integer.MAX_VALUE, j-i+1};
+            if(i==left && j==right){
+                return new int[]{t[node], cnt[node]};
+            }else{
+                int middle = (left+right)>>1;
+                int[] getLeft = {Integer.MAX_VALUE, -1}, getRight = {Integer.MAX_VALUE, -1};
+                if(i<=middle) getLeft = getMinimum(i, Math.min(j, middle), left, middle, node * 2);
+                if(j>middle) getRight = getMinimum(Math.max(i, middle + 1), j, middle + 1, right, node * 2 + 1);
+                int[] res = new int[2];
+                if(getLeft[0]<getRight[0]){
+                    res[0] = getLeft[0];
+                    res[1] = getLeft[1] + (getLeft[0]==getRight[0] ? getRight[1] : 0);
+                }else{
+                    res[0] = getRight[0];
+                    res[1] = getRight[1] + (getLeft[0]==getRight[0] ? getLeft[1] : 0);
+                }
+                res[0] += add[node];
+                return res;
+            }
+        }
+
+        public int[] getMinimum(int left, int right){
+            return getMinimum(left, right, 0, d-1, 1);
         }
     }
 
@@ -543,178 +619,7 @@ public class DataStruct {
             }
         }
     }
-
-    public static class SegmentTreeImba{
-        private static int inf = Integer.MAX_VALUE;
-        private static int unset = Integer.MIN_VALUE;
-
-        public SegmentTreeImba left, right;
-        int size;
-
-        private long sum;
-        private int min, max;
-        private int add, set;
-
-        private void push(){
-            if(add!=0){
-                if(left!=null) left.newAdd(add);
-                if(right!=null) right.newAdd(add);
-                add=0;
-            }else
-            if(set!=unset){
-                if(left!=null) left.newSet(set);
-                if(right!=null) right.newSet(set);
-                set=unset;
-            }
-        }
-
-        private void calc(){
-            if(set==unset){
-                sum = (left==null ? 0 : left.sum + right.sum) + 1l*add*size;
-                min = (left==null ? 0 : Math.min(left.min,right.min)) + add;
-                max = (left==null ? 0 : Math.max(left.max,right.max)) + add;
-            }else{
-                min = max = set;
-                sum = 1l*set*size;
-            }
-        }
-
-        private void newAdd(int newAdd){
-            if(set==unset){
-                add+=newAdd;
-            }else{
-                add=0;
-                set+=newAdd;
-            }
-            calc();
-        }
-
-        private void newSet(int newSet){
-            if(add!=0) push();
-            set=newSet;
-            calc();
-        }
-
-        public static SegmentTreeImba build(int left, int right){
-            if(left==right) return new SegmentTreeImba(0, unset, null, null);
-            int middle = (left + right)>>1;
-            return new SegmentTreeImba(0, unset, build(left,middle), build(middle+1,right));
-        }
-
-        private SegmentTreeImba(int _add, int _set, SegmentTreeImba _left, SegmentTreeImba _right){
-            left = _left;
-            right = _right;
-            add = _add;
-            set = _set;
-            size = (left==null? 1 : left.size+right.size);
-            calc();
-        }
-
-        public long getSum(int i, int j){
-            if(!(i<=j && 0<=i && j<size)) return 0;
-            if(i==0 && j==size-1){
-                return sum;
-            }else{
-                push();
-                int m = left.size-1;
-                long sl = 0, sr = 0;
-                if(i<=m) sl = left.getSum(i, Math.min(m, j));
-                if(j>m) sr = right.getSum(Math.max(0, i - m - 1), j-m-1);
-                return sl+sr;
-            }
-        }
-
-        public long getMaximum(int i, int j){
-            if(!(i<=j && 0<=i && j<size)) return -inf;
-            if(i==0 && j==size-1){
-                return max;
-            }else{
-                push();
-                int m = left.size-1;
-                long sl = -inf, sr = -inf;
-                if(i<=m) sl = left.getMaximum(i, Math.min(m, j));
-                if(j>m) sr = right.getMaximum(Math.max(0, i - m - 1), j-m-1);
-                return Math.max(sl, sr);
-            }
-        }
-
-        public long getMinimum(int i, int j){
-            if(!(i<=j && 0<=i && j<size)) return inf;
-            if(i==0 && j==size-1){
-                return min;
-            }else{
-                push();
-                int m = left.size-1;
-                long sl = inf, sr = inf;
-                if(i<=m) sl = left.getMinimum(i, Math.min(m, j));
-                if(j>m) sr = right.getMinimum(Math.max(0,i-m-1), j-m-1);
-                return Math.min(sl,sr);
-            }
-        }
-
-        public void setRange(int i, int j, int value){
-            if(!(i<=j && 0<=i && j<size)) return;
-            if(i==0 && j==size-1){
-                newSet(value);
-            }else{
-                push();
-                int m = left.size-1;
-                if(i<=m) left.setRange(i, Math.min(m, j), value);
-                if(j>m) right.setRange(Math.max(0, i - m - 1), j-m-1, value);
-                calc();
-            }
-        }
-
-        public void addRange(int i, int j, int value){
-            if(!(i<=j && 0<=i && j<size)) return;
-            if(i==0 && j==size-1){
-                newAdd(value);
-            }else{
-                push();
-                int m = left.size-1;
-                if(i<=m) left.addRange(i, Math.min(m, j), value);
-                if(j>m) right.addRange(Math.max(0, i - m - 1), j-m-1, value);
-                calc();
-            }
-        }
-
-        public SegmentTreeImba P_setRange(int i, int j, int value){
-            if(!(i<=j && 0<=i && j<size)) return null;
-            if(i==0 && j==size-1){
-                SegmentTreeImba t = new SegmentTreeImba(add, set, left, right);
-                t.newSet(value);
-                return t;
-            }else{
-                push();
-                SegmentTreeImba t = new SegmentTreeImba(add, set, left, right);
-                int m = left.size-1;
-                if(i<=m) t.left = left.P_setRange(i, Math.min(m, j), value);
-                if(j>m) t.right = right.P_setRange(Math.max(0, i - m - 1), j-m-1, value);
-                t.calc();
-                return t;
-            }
-        }
-
-        public SegmentTreeImba P_addRange(int i, int j, int value){
-            if(!(i<=j && 0<=i && j<size)) return null;
-            if(i==0 && j==size-1){
-                SegmentTreeImba t = new SegmentTreeImba(add, set, left, right);
-                t.newAdd(value);
-                return t;
-            }else{
-                push();
-                SegmentTreeImba t = new SegmentTreeImba(add, set, left, right);
-                int m = left.size-1;
-                if(i<=m) t.left = left.P_addRange(i, Math.min(m, j), value);
-                if(j>m) t.right = right.P_addRange(Math.max(0, i - m - 1), j-m-1, value);
-                t.calc();
-                return t;
-            }
-        }
-
-    }
-
-
+    
 
     public static class FenwickTreeSum{
         private long t[];
