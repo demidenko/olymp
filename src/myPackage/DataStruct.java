@@ -398,9 +398,9 @@ public class DataStruct {
         }
     }
 
-    public static class SegmentTreeMinCntSegAdd {
+    public static class SegmentTreeMinCntSegAdd{
         private int t[];
-        private int cnt[];
+        private int cntMin[];
         private int add[];
         private int d;
 
@@ -409,16 +409,16 @@ public class DataStruct {
             for(d=1; d<n; d<<=1);
             t = new int[d<<1];
             add = new int[d<<1];
-            cnt = new int[d<<1];
-            for(i=d; i<n+d; ++i){ t[i] = array[i-d]; cnt[i] = 1; }
-            for(i=n+d; i<d+d; ++i){ t[i] = Integer.MAX_VALUE; cnt[i] = 1; }
+            cntMin = new int[d<<1];
+            for(i=d; i<n+d; ++i){ t[i] = array[i-d]; cntMin[i] = 1; }
+            for(i=n+d; i<d+d; ++i){ t[i] = Integer.MAX_VALUE; cntMin[i] = 1; }
             for(i=d-1; i>0; --i){
                 if(t[i*2]<t[i*2+1]){
                     t[i] = t[i*2];
-                    cnt[i] = cnt[i*2] + (t[i*2]==t[i*2+1] ? cnt[i*2+1] : 0);
+                    cntMin[i] = cntMin[i*2] + (t[i*2]==t[i*2+1] ? cntMin[i*2+1] : 0);
                 }else{
                     t[i] = t[i*2+1];
-                    cnt[i] = cnt[i*2+1] + (t[i*2]==t[i*2+1] ? cnt[i*2] : 0);
+                    cntMin[i] = cntMin[i*2+1] + (t[i*2]==t[i*2+1] ? cntMin[i*2] : 0);
                 }
             }
         }
@@ -433,10 +433,10 @@ public class DataStruct {
                 if(j>middle) add(Math.max(i, middle + 1), j, value, middle+1, right, node*2+1);
                 if(t[node*2]<t[node*2+1]){
                     t[node] = t[node*2];
-                    cnt[node] = cnt[node*2] + (t[node*2]==t[node*2+1] ? cnt[node*2+1] : 0);
+                    cntMin[node] = cntMin[node*2] + (t[node*2]==t[node*2+1] ? cntMin[node*2+1] : 0);
                 }else{
                     t[node] = t[node*2+1];
-                    cnt[node] = cnt[node*2+1] + (t[node*2]==t[node*2+1] ? cnt[node*2] : 0);
+                    cntMin[node] = cntMin[node*2+1] + (t[node*2]==t[node*2+1] ? cntMin[node*2] : 0);
                 }
                 t[node] += add[node];
             }
@@ -450,7 +450,7 @@ public class DataStruct {
         private int[] getMinimum(int i, int j, int left, int right, int node){
             if(i>j || left>right || left>i || j>right) return new int[]{Integer.MAX_VALUE, j-i+1};
             if(i==left && j==right){
-                return new int[]{t[node], cnt[node]};
+                return new int[]{t[node], cntMin[node]};
             }else{
                 int middle = (left+right)>>1;
                 int[] getLeft = {Integer.MAX_VALUE, -1}, getRight = {Integer.MAX_VALUE, -1};
