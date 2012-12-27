@@ -1,5 +1,8 @@
 package myPackage;
 
+import java.util.Arrays;
+import java.util.Stack;
+
 public class MiscUtils{
     
 
@@ -131,5 +134,114 @@ public class MiscUtils{
             }
         }
         return p;
+    }
+    
+    
+    
+    public static long calculate(String s){
+        int n = s.length(), i, j;
+        int br[] = new int[n];
+        Arrays.fill(br, -1);
+        Stack<Integer> st = new Stack<Integer>();
+        for(i=0;i<n;++i){
+            if(s.charAt(i)=='(') st.add(i); else
+            if(s.charAt(i)==')'){
+                j = st.pop();
+                br[i] = j;
+                br[j] = i;
+            }
+        }
+        for(i=j=0;i<n;++i){
+            char ch = s.charAt(i);
+            if('0'<=ch && ch<='9'); else{
+                if(i-1>=j){
+                    br[j] = i-1;
+                    br[i-1] = j;
+                }
+                j = i+1;
+            }
+        }
+        if(i-1>=j){
+            br[j] = i-1;
+            br[i-1] = j;
+        }
+        //for(i=0;i<n;++i) System.out.print(br[i]+" "); System.out.println();
+        return calculate(s.toCharArray(), br, 0, n - 1);
+    }
+    
+    private static long calculate(char s[], int br[], int l, int r){
+        if(br[l] == r){
+            if(s[l]=='(') return calculate(s, br, l + 1, r - 1);
+            if('0'<=s[l] && s[l]<='9') return Long.parseLong(new String(s, l, r-l+1));
+        }
+        char tp = 's';
+        int sign = 1;
+        int i,j;
+        Stack<Long> st = new Stack<Long>(), _st = new Stack<Long>();
+        Stack<Character> op = new Stack<Character>(), _op = new Stack<Character>();
+        for(i=l; i<=r;){
+            if(tp=='s'){
+                if(s[i]=='-'){
+                    sign *= -1;
+                    ++i;
+                }else{
+                    tp = 'x';
+                }
+            }else
+            if(tp=='x'){
+                long call = calculate(s, br, i, br[i]);
+                st.push(call*sign);
+                tp = 'o';
+                i = br[i] + 1;
+            }else
+            if(tp=='o'){
+                if(s[i]!='+' && s[i]!='-' && s[i]!='*') throw new RuntimeException("wtf#2 "+s[i]);
+                op.push(s[i]);
+                tp = 's';
+                sign = 1;
+                ++i;
+            }
+        }
+        _st.clear(); _st.addAll(st);
+        _op.clear(); _op.addAll(op);
+        st.clear();
+        op.clear();
+        st.push(_st.get(0));
+        for(i=0;i<_op.size();++i){
+            char o = _op.get(i);
+            if(o=='*'){
+                long x = st.pop();
+                long y = _st.get(i+1);
+                long res = x*y;
+                st.add(res);
+            }else{
+                st.push(_st.get(i+1));
+                op.push(o);
+            }
+        }
+        _st.clear(); _st.addAll(st);
+        _op.clear(); _op.addAll(op);
+        st.clear();
+        op.clear();
+        st.push(_st.get(0));
+        for(i=0;i<_op.size();++i){
+            char o = _op.get(i);
+            if(o=='+'){
+                long x = st.pop();
+                long y = _st.get(i+1);
+                long res = x+y;
+                st.add(res);
+            }else
+            if(o=='-'){
+                long x = st.pop();
+                long y = _st.get(i+1);
+                long res = x-y;
+                st.add(res);
+            }else{
+                st.push(_st.get(i+1));
+                op.push(o);
+            }
+        }
+        return st.pop();
     }
 }
