@@ -43,21 +43,22 @@ public class Treap<T extends Comparable>{
         return t;
     }
 
-    private tree[] split(tree t, T splitKey){
+    private tree[] retSplit = new tree[2];
+    private void split(tree t, T splitKey){
         push(t);
-        if(t==null) return new tree[]{null, null}; else
+        if(t==null){
+            retSplit[0] = retSplit[1] = null;
+        }else
         if(t.key.compareTo(splitKey)<0){
-            tree[] res = split(t.right, splitKey);
-            t.right = res[0];
+            split(t.right, splitKey);
+            t.right = retSplit[0];
             update(t);
-            res[0] = t;
-            return res;
+            retSplit[0] = t;
         }else{
-            tree[] res = split(t.left, splitKey);
-            t.left = res[1];
+            split(t.left, splitKey);
+            t.left = retSplit[1];
             update(t);
-            res[1] = t;
-            return res;
+            retSplit[1] = t;
         }
     }
 
@@ -65,8 +66,8 @@ public class Treap<T extends Comparable>{
         push(t);
         if(t==null) t = v; else
         if(t.prior < v.prior){
-            tree res[] = split(t, (T) v.key);
-            v.left = res[0]; v.right = res[1];
+            split(t, (T) v.key);
+            v.left = retSplit[0]; v.right = retSplit[1];
             t = v;
         }else{
             int cmp = v.key.compareTo(t.key);
