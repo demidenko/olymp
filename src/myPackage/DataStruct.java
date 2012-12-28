@@ -611,7 +611,6 @@ public class DataStruct {
                 return t;
             }else{
                 SegmentTreeSumPersistent t = new SegmentTreeSumPersistent(left, right);
-                int m = left.size-1;
                 if(index<left.size) t.left = left.P_add(index, value);
                 else t.right = right.P_add(index-left.size, value);
                 t.calc();

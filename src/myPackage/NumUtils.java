@@ -236,7 +236,7 @@ public class NumUtils {
         long c = pow(b,t,mod);
         long r = pow(a,(t+1)>>1,mod);
         for(int i=1;i<s;++i){
-            long d = pow(r*r*aInv,1l<<(s-i-1),mod);
+            long d = pow(r*r%mod*aInv,1l<<(s-i-1),mod);
             if(d==mod-1) r=(r*c)%mod;
             c=(c*c)%mod;
         }
