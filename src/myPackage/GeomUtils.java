@@ -181,7 +181,7 @@ public class GeomUtils{
         for(i=n=1;i<m;++i) if(c[i].compareTo(c[n-1])!=0) c[n++]=c[i];
         m = Math.min(2,n);
         for(i=2;i<n;++i){
-            while(m>1 && vectorProduct(c[i],c[m-2],c[m-1])<0) --m;
+            while(m>1 && vectorProduct(c[i],c[m-2],c[m-1])<=0) --m;
             c[m++] = c[i];
         }
         return Arrays.copyOf(c,m);
