@@ -47,7 +47,7 @@ public class GraphUtils{
         }
         Pair<Integer, Integer> res[] = new Pair[mm];
         mm = 0;
-        for(i=0;i<n;++i) if(f[i]!=-1) res[mm++] = new Pair<Integer, Integer>(f[i], i);
+        for(i=0;i<m;++i) if(f[i]!=-1) res[mm++] = new Pair<Integer, Integer>(f[i], i);
         return res;
     }
     
@@ -55,7 +55,7 @@ public class GraphUtils{
         if(u[i]) return false;
         u[i] = true;
         for(int j=0; j<graph[i].length; ++j) if(graph[i][j]){
-            if(f[j]==-1 || dfsKhun(graph, j, f, u)){
+            if(f[j]==-1 || dfsKhun(graph, f[j], f, u)){
                 f[j] = i;
                 return true;
             }
