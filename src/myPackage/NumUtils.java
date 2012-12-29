@@ -21,22 +21,15 @@ public class NumUtils {
     }
 
     public static int[] gcdExtended(int a, int b){
-        int r, q, x0, y0, x1, y1, x, y;
-        x0=1; x1=x=0;
-        y0=0; y1=y=1;
-        while(b!=0){
-            r = a%b;
-            q = a/b;
-            if(r!=0){
-                x = x0-q*x1;
-                y = y0-q*y1;
-                x0 = x1; y0 = y1;
-                x1 = x; y1 = y;
-            }
-            a = b; b = r;
-        }
-        if(a<0){ a=-a; x=-x; y=-y; }
-        return new int[]{a, x, y};
+        if(a==0) return new int[]{b, 0, 1};
+        int call[] = gcdExtended(b%a, a);
+        return new int[]{call[0], (call[0]-b*call[1])/a, call[1]};
+    }
+
+    public static long[] gcdExtended(long a, long b){
+        if(a==0) return new long[]{b, 0, 1};
+        long call[] = gcdExtended(b%a, a);
+        return new long[]{call[0], (call[0]-b*call[1])/a, call[1]};
     }
 
     public static long lcm(int a, int b){
@@ -77,7 +70,7 @@ public class NumUtils {
             a=(a*a)%mod;
             b>>=1;
         }
-        return res;
+        return res%mod;
     }
 
     public static boolean isPrime(int n){
@@ -158,21 +151,9 @@ public class NumUtils {
     }
 
     public static long modInverse(long a, long mod){
-        long r, q, x0, x1, x, b = mod;
-        x0=1; x1=x=0;
         a = (a%mod+mod)%mod;
-        while(b!=0){
-            r = a%b;
-            q = a/b;
-            if(r!=0){
-                x = x0-q*x1;
-                x0 = x1;
-                x1 = x;
-            }
-            a = b; b = r;
-        }
-        x=(x%mod+mod)%mod;
-        return x;
+        long[] call = gcdExtended(a,mod);
+        return (call[1]%mod+mod)%mod;
     }
 
     public static long[] factorize(long n){
