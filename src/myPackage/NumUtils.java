@@ -150,6 +150,19 @@ public class NumUtils {
         return res;
     }
 
+    public static int[] getDivisorsArray(int n){
+        int d[] = new int[n+1];
+        int p[] = new int[n*2/(32-Integer.numberOfLeadingZeros(n))+1], m = 0;
+        for(int i=2;i<=n;++i){
+            if(d[i]==0){
+                d[i] = i;
+                p[m++] = i;
+            }
+            for(int j=0;j<m && p[j]<=d[i] && p[j]*i<=n;++j) d[p[j]*i] = p[j];
+        }
+        return d;
+    }
+
     public static long modInverse(long a, long mod){
         a = (a%mod+mod)%mod;
         long[] call = gcdExtended(a,mod);
