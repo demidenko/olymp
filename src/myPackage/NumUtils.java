@@ -79,6 +79,18 @@ public class NumUtils {
         return true;
     }
 
+    public static boolean[] getPrimeArray(int n){
+        int i, j;
+        boolean[] p = new boolean[n+1];
+        if(n<2) return p;
+        p[2] = true;
+        for(i=3; i<=n; i+=2) p[i] = true;
+        for(i=3; i*i<=n; i+=2) if(p[i]){
+            for(j=i*i; j<=n; j+=i*2) p[j] = false;
+        }
+        return p;
+    }
+    
     public static int[] getPrimes(int n){
         if(n<2) return new int[0];
         int i, j, m = 0;
