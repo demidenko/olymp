@@ -81,18 +81,16 @@ public class NumUtils {
 
     public static int[] getPrimes(int n){
         if(n<2) return new int[0];
-        int i, j, m=1;
+        int i, j, m = 0;
         boolean[] p = new boolean[(n+1)/2+1];
+        int res[] = new int[countOfPrimes(n)];
+        res[m++] = 2;
         for(i=3; i*i<=n; i+=2) if(!p[i>>1]){
+            res[m++] = i;
             for(j=i*i; j<=n; j+=i*2) p[j>>1]=true;
-            ++m;
         }
-        for(; i<=n; i+=2) if(!p[i>>1]) ++m;
-        int[] res = new int[m];
-        m=1;
-        res[0] = 2;
-        for(i=3; i<=n; i+=2) if(!p[i>>1]) res[m++]=i;
-        return res;
+        for(; i<=n; i+=2) if(!p[i>>1]) res[m++] = i;
+        return Arrays.copyOf(res, m);
     }
 
     public static int getPrime(int n){	//p(5e7) = 982451653
@@ -152,7 +150,7 @@ public class NumUtils {
 
     public static int[] getDivisorsArray(int n){
         int d[] = new int[n+1];
-        int p[] = new int[n*2/(32-Integer.numberOfLeadingZeros(n))+1], m = 0;
+        int p[] = new int[countOfPrimes(n)], m = 0;
         for(int i=2;i<=n;++i){
             if(d[i]==0){
                 d[i] = i;
@@ -247,6 +245,10 @@ public class NumUtils {
             d=(nx<x);
             x=nx;
         }
+    }
+    
+    public static int countOfPrimes(int n){
+        return 2*n/(32-Integer.numberOfLeadingZeros(n))+1;
     }
     
 
