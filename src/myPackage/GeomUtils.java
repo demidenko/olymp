@@ -322,6 +322,26 @@ public class GeomUtils{
         
         
     }
+    
+    
+    
+    public static double orientedVolume(Point3D p1, Point3D p2, Point3D p3, Point3D p4){
+        double a1=p1.x-p4.x, a2=p1.y-p4.y, a3=p1.z-p4.z;
+        double b1=p2.x-p4.x, b2=p2.y-p4.y, b3=p2.z-p4.z;
+        double c1=p3.x-p4.x, c2=p3.y-p4.y, c3=p3.z-p4.z;
+        return a1*(b2*c3-b3*c2)
+               - a2*(b1*c3-b3*c1)
+               + a3*(b1*c2-b2*c1);
+    }
+    
+    public static double areaOfTriangle3D(Point3D p1, Point3D p2, Point3D p3){
+        double a1=p1.x-p3.x, a2=p1.y-p3.y, a3=p1.z-p3.z;
+        double b1=p2.x-p3.x, b2=p2.y-p3.y, b3=p2.z-p3.z;
+        double x=a2*b3-a3*b2;
+        double y=-(a1*b3-a3*b1);
+        double z=a1*b2-b1*a2;
+        return Math.sqrt(x*x+y*y+z*z);
+    }
 
 
     public static final Comparator comparatorPointXY = new Comparator<Point>(){

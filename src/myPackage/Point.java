@@ -49,6 +49,10 @@ public class Point implements Comparable<Point>{
         double s = (p.x-x)*(q.y-y) - (p.y-y)*(q.x-x);
         return Math.abs(s/Math.sqrt(c));
     }
+    
+    public double projectionToSegment(Point p, Point q){
+        return ((x-p.x)*(x-p.x)+(y-p.y)*(y-p.y)) / ((q.x-p.x)*(q.x-p.x)+(q.y-p.y)*(q.y-p.y)); 
+    }
 
     public Point rotate(double angle){
         double s = Math.sin(angle), c = Math.cos(angle);
