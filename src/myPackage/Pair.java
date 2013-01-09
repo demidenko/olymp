@@ -1,6 +1,6 @@
 package myPackage;
 
-public class Pair<X extends Comparable, Y extends Comparable> implements Comparable<Pair>{
+public class Pair<X, Y> implements Comparable<Pair>{
     public X first;
     public Y second;
     
@@ -10,9 +10,9 @@ public class Pair<X extends Comparable, Y extends Comparable> implements Compara
     }
     
     public int compareTo(Pair o) {
-        int cmp = first.compareTo(o.first);
+        int cmp = ((Comparable)first).compareTo(o.first);
         if(cmp!=0) return cmp;
-        return second.compareTo(o.second);
+        return ((Comparable)second).compareTo(o.second);
     }
     
     public Pair<Y, X> swap(){
