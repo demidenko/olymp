@@ -6,6 +6,21 @@ public class ArrayUtils{
     private final static Random random = new Random(System.nanoTime());
     static final int SMALL = 50;
 
+    public static void qsortSpecialForRoman(int a[], int l, int r){
+        if(l>=r) return;
+        int i=l, j=r, m=i+j>>1;
+        do{
+            while(a[i]<a[m]) ++i;
+            while(a[j]>a[m]) --j;
+            if(i<=j){
+                int t=a[i]; a[i]=a[j]; a[j]=t;
+                ++i; --j;
+            }
+        }while(i<=j);
+        if(i<r) qsortSpecialForRoman(a, i, r);
+        if(l<j) qsortSpecialForRoman(a, l, j);
+    }
+    
     public static void sort(int a[], int l, int r){
         if(l>=r) return;
         int i,j,k;
