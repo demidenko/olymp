@@ -30,6 +30,10 @@ public class Compressor {
         return i<0 ? -i-1-1 : i;
     }
     
+    public int getValue(int index){
+        return a[index];
+    }
+    
     public int size(){
         return a.length;
     }

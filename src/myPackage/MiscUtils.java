@@ -1,5 +1,8 @@
 package myPackage;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Stack;
 
@@ -243,5 +246,62 @@ public class MiscUtils{
             }
         }
         return st.pop();
+    }
+    
+    
+    static BigDecimal _2 = BigDecimal.valueOf(2);
+    static MathContext mc = new MathContext(50, RoundingMode.HALF_UP);
+    static BigDecimal eps = new BigDecimal("1e-15");
+    //
+    public static BigDecimal[] realRoots(BigDecimal p[]){
+        int n = p.length-1;
+        if(n==1){
+            return new BigDecimal[]{
+                    p[1].negate().divide(p[0], mc)
+            };
+        }
+        /*if(n==2){
+            BigDecimal D = p[1].multiply(p[1],mc).subtract(p[0].multiply(p[2]).multiply(BigDecimal.valueOf(4)),mc);
+            if(D.signum()<0) return new BigDecimal[0];
+            D = sqrt(D);
+            return new BigDecimal[]{
+                    p[1].negate().subtract(D).divide(p[0].multiply(_2),mc),
+                    p[1].negate().add(D).divide(p[0].multiply(_2),mc)
+            };
+        }*/
+        BigDecimal d[] = new BigDecimal[n];
+        for(int i=0;i<n;++i) d[i] = p[i].multiply(BigDecimal.valueOf(n - i));
+        BigDecimal ext[] = realRoots(d);
+        BigDecimal res[] = new BigDecimal[n];
+        int m = 0;
+        for(int i=0;i<=ext.length;++i){
+            BigDecimal l = (i==0 ? new BigDecimal("-1e10") : ext[i-1]);
+            BigDecimal r = (i==ext.length ? new BigDecimal("1e10") : ext[i]);
+            boolean increases = valueAt(p, l).compareTo(valueAt(p, r))<0;
+            for(int it=0; it<200; ++it){
+                BigDecimal x = l.add(r).divide(_2, mc);
+                if(valueAt(p, x).signum()>0 == increases) r = x; else l = x;
+            }
+            if(valueAt(p, l).abs().compareTo(eps)<0) res[m++] = l;
+        }
+        return Arrays.copyOf(res, m);
+    }
+    
+    public static BigDecimal valueAt(BigDecimal p[], BigDecimal x){
+        BigDecimal xp = x;
+        BigDecimal s = p[p.length-1];
+        for(int i=p.length-2;i>=0;--i){
+            s = s.add(p[i].multiply(xp), mc);
+            if(i>0) xp = xp.multiply(x, mc);
+        }
+        return s;
+    }
+    
+    public static BigDecimal sqrt(BigDecimal x){
+        if(x.signum()<0) throw new ArithmeticException();
+        BigDecimal r = _2;
+        for(int it=0; it<50; ++it)
+            r = r.add(x.divide(r,mc)).divide(_2,mc);
+        return r;
     }
 }

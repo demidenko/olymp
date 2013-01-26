@@ -35,6 +35,7 @@ public class GraphUtils{
     }
     
     public static Pair<Integer, Integer>[] maxMatching(boolean graph[][]){
+        if(graph.length==0 || graph[0].length==0) return new Pair[0];
         int n = graph.length, m = graph[0].length;
         int i;
         boolean u[] = new boolean[n];

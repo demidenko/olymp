@@ -119,6 +119,17 @@ public class DataStruct {
         public long getSum(){
             return t[1];
         }
+        
+        public int getIndexWithSum(long s){
+            int i=1;
+            while(i<d){
+                if(t[i*2]>=s) i<<=1; else{
+                    s-=t[i*2];
+                    i=i<<1|1;
+                }
+            }
+            return i-d;
+        }
     }
 
     public static class SegmentTreeArray {
